@@ -1,4 +1,7 @@
+var NpmInstallPlugin = require('npm-install-webpack-plugin')
 var path = require('path')
+var autoprefixer = require('autoprefixer')
+var precss = require('precss')
 var webpack = require('webpack')
 
 module.exports = {
@@ -16,18 +19,35 @@ module.exports = {
     plugins: [
         new webpack.optimize.OccurrenceOrderPlugin(),
         new webpack.HotModuleReplacementPlugin(),
-        new webpack.NoErrorsPlugin()
+        new webpack.NoErrorsPlugin(),
+        new NpmInstallPlugin()
     ],
     module: {
+        preLoaders: [
+            {
+                test: /\.js$/,
+                loaders: ['eslint'],
+                include: [
+                    path.resolve(__dirname, "src"),
+                ],
+            }
+        ],
         loaders: [
             {
-                loaders: ['babel-loader'],
+                loaders: ['react-hot', 'babel-loader'],
                 include: [
                     path.resolve(__dirname, "src"),
                 ],
                 test: /\.js$/,
                 plugins: ['transform-runtime'],
+            },
+            {
+                test:   /\.css$/,
+                loader: "style-loader!css-loader!postcss-loader"
             }
         ]
+    },
+    postcss: function () {
+        return [autoprefixer, precss];
     }
 };
